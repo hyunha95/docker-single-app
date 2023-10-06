@@ -1,0 +1,29 @@
+version: 2.1
+jobs:
+    build:
+        docker:
+            - image: circleci/node:12
+    
+        steps:
+            - checkout
+    
+            - setup_remote_docker:
+                version: 20.10.7
+            
+            - run:
+                name: "Build Docker Image"
+                command: docker build -t hyunha/docker-react-app -f Dockerfile.dev .
+            
+            - run:
+                name: "Run Tests"
+                command: docker run -e CI=true hyunha/docker-react-app npm run test -- --coverage
+            
+            - store_artifacts:
+                path: test_results
+                destination: test_results
+
+workflows:
+    version: 2
+    build-and-test:
+    jobs:
+        - build
