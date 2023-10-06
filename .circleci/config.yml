@@ -25,7 +25,7 @@ jobs:
                   name: "Deploy to Elastic Beanstalk"
                   command: |
                     # AWS CLI 설정
-                    # echo -e "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY\nAWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY\nAWS_DEFAULT_REGION=ap-northeast-2" > ~/.env
+                    echo -e "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY\nAWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY\nAWS_DEFAULT_REGION=ap-northeast-2" > ~/.env
         
                     # Elastic Beanstalk 배포
                     aws configure set aws_access_key_id $AWS_ACCESS_KEY
