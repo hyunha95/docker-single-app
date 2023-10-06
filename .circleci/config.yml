@@ -1,48 +1,50 @@
 version: 2.1
+orbs:
+  aws-cli: circleci/aws-cli@4.0
+  aws-s3: circleci/aws-s3@4.0
 jobs:
-    build:
-        docker:
-            - image: cimg/node:lts
-            - image: cimg/aws:2023.09
+  build:
+    docker:
+      - image: cimg/node:lts
+      - image: cimg/aws:2023.09
     
-        steps:
-            - checkout
-            - setup_remote_docker:
-                version: 20.10.7
-#            - aws-cli/setup:
-#                aws-access-key-id: $AWS_ACCESS_KEY
-#                aws-secret-access-key: $AWS_SECRET_ACCESS_KEY
-#                aws-region: ap-northeast-2
+    steps:
+      - checkout
+      - setup_remote_docker
+      - aws-cli/setup:
+          aws-access-key-id: $AWS_ACCESS_KEY
+          aws-secret-access-key: $AWS_SECRET_ACCESS_KEY
+          aws-region: ap-northeast-2
 
-            - run:
-                name: "Go one directory up"
-                command: cd ..
+      - run:
+          name: "Go one directory up"
+          command: cd ..
 
-            - run:
-                name: "Build Docker Image"
-                command: docker build -t hyunha/docker-react-app -f Dockerfile.dev .
+      - run:
+          name: "Build Docker Image"
+          command: docker build -t hyunha/docker-react-app -f Dockerfile.dev .
+
+      - run:
+          name: "Run Tests"
+          command: docker run -e CI=true hyunha/docker-react-app npm run test -- --coverage
+
+          # Elastic Beanstalk 배포
+      - deploy:
+          name: "Deploy to Elastic Beanstalk"
+          command: |
+            # AWS CLI 설정
+            echo -e "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY\nAWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY\nAWS_DEFAULT_REGION=ap-northeast-2" > ~/.env
             
-            - run:
-                name: "Run Tests"
-                command: docker run -e CI=true hyunha/docker-react-app npm run test -- --coverage
+            # Elastic Beanstalk 배포
+            aws configure set aws_access_key_id $AWS_ACCESS_KEY
+            aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+            aws configure set default.region ap-northeast-2
+            
+            eb init -r ap-northeast-2 -p docker-react-app
+            eb use Docker-react-app-env
+            eb deploy
 
-                # Elastic Beanstalk 배포
-            - deploy:
-                  name: "Deploy to Elastic Beanstalk"
-                  command: |
-                    # AWS CLI 설정
-                    echo -e "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY\nAWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY\nAWS_DEFAULT_REGION=ap-northeast-2" > ~/.env
-        
-                    # Elastic Beanstalk 배포
-                    aws configure set aws_access_key_id $AWS_ACCESS_KEY
-                    aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-                    aws configure set default.region ap-northeast-2
-        
-                    eb init -r ap-northeast-2 -p docker-react-app
-                    eb use Docker-react-app-env
-                    eb deploy
-                    
 workflows:
-    build-and-test:
-        jobs:
-            - build
+  build-and-test:
+    jobs:
+      - build
