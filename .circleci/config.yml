@@ -3,10 +3,15 @@ jobs:
     build:
         docker:
             - image: cimg/node:lts
+            - image: circleci/aws-cli@4.1.1
     
         steps:
             - checkout
             - setup_remote_docker
+            - aws-cli/setup:
+                aws-access-key-id: $AWS_ACCESS_KEY
+                aws-secret-access-key: $AWS_SECRET_ACCESS_KEY
+                aws-region: ap-northeast-2
 
             - run:
                 name: "Go one directory up"
