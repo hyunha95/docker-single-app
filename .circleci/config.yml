@@ -3,7 +3,7 @@ jobs:
     build:
         docker:
             - image: cimg/node:lts
-            - image: circleci/aws-cli@4.1.1
+            - image: cimg/aws:2023.09
     
         steps:
             - checkout
