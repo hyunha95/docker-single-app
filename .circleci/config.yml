@@ -11,6 +11,9 @@ jobs:
             - run:
                 name: "PWD"
                 command: pwd
+            - run:
+                name: "ls"
+                command: ls
 
             - run:
                 name: "Build Docker Image"
