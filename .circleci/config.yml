@@ -14,10 +14,13 @@ jobs:
             - run:
                 name: "ls"
                 command: ls
+            - run:
+                name: "cd .."
+                command: cd ..
 
             - run:
                 name: "Build Docker Image"
-                command: docker build -t hyunha/docker-react-app -f Dockerfile.dev ../
+                command: docker build -t hyunha/docker-react-app -f Dockerfile.dev .
             
             - run:
                 name: "Run Tests"
