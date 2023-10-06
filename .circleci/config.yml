@@ -5,7 +5,8 @@ jobs:
             - image: cimg/node:lts
     
         steps:
-            - checkout
+            - checkout:
+                path: ~/
             - setup_remote_docker
             
             - run:
